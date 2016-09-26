@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/daddye/trez"
+	"github.com/vharitonsky/trez"
 	"github.com/rcrowley/go-metrics"
 )
 
@@ -35,7 +35,7 @@ func main() {
 	workers := runtime.GOMAXPROCS(0)
 	filename := ""
 	size := "200x200,400x180,800x600"
-	algo := "fit,fill"
+	algo := "fit,fill,crop"
 
 	flag.IntVar(&times, "times", times, "number of resizes")
 	flag.IntVar(&workers, "workers", workers, "number of workers")
@@ -88,7 +88,9 @@ func main() {
 			algos = append(algos, trez.FIT)
 		case "fill":
 			algos = append(algos, trez.FILL)
-		}
+	  case "crop":
+	   algos = append(algos, trez.CROP)
+	 }
 	}
 
 	go func() {

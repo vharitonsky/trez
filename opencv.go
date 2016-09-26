@@ -134,6 +134,39 @@ func Resize(data []byte, options Options) ([]byte, error) {
 		C.cvSetImageROI(mid, rect)
 		dst = (*C.IplImage)(C.cvClone(unsafe.Pointer(mid)))
 		C.cvResetImageROI(mid)
+	case CROP:
+		imageAr := float64(src.width) / float64(src.height)
+		sizeAr := float64(options.Width) / float64(options.Height)
+
+		if imageAr > sizeAr {
+			rect := C.CvRect{}
+			rect.x = C.int(0.5 * (float64(src.width) - sizeAr*float64(src.height)))
+			rect.y = 0
+			rect.width = src.width - (2 * rect.x)
+			rect.height = src.height
+			C.cvSetImageROI(src, rect)
+		} else if imageAr < sizeAr {
+			rect := C.CvRect{}
+			rect.x = 0
+			rect.y = C.int(0.5 * (float64(src.height) - float64(src.width)/sizeAr))
+			rect.width = src.width
+			rect.height = src.height - (2 * rect.y)
+			C.cvSetImageROI(src, rect)
+		}
+
+		size := C.cvSize(
+			C.int(math.Ceil(float64(options.Width))),
+			C.int(math.Ceil(float64(options.Height))),
+		)
+
+		mid := C.cvCreateImage(size, src.depth, src.nChannels)
+
+		defer C.cvReleaseImage(&mid)
+
+		C.cvResize(unsafe.Pointer(src), unsafe.Pointer(mid), C.CV_INTER_AREA)
+
+		dst = (*C.IplImage)(C.cvClone(unsafe.Pointer(mid)))
+		C.cvResetImageROI(mid)
 	}
 
 	// set default compression

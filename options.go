@@ -19,6 +19,7 @@ type Algo int
 const (
 	FIT Algo = iota
 	FILL
+	CROP
 )
 
 type Options struct {
