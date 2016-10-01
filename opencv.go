@@ -167,6 +167,8 @@ func Resize(data []byte, options Options) ([]byte, error) {
 
 		dst = (*C.IplImage)(C.cvClone(unsafe.Pointer(mid)))
 		C.cvResetImageROI(mid)
+		C.free(unsafe.Pointer(mid))
+
 	}
 
 	// set default compression
@@ -192,6 +194,7 @@ func Resize(data []byte, options Options) ([]byte, error) {
 	ptr := C.ptr_from_mat(ret)
 	data = C.GoBytes(unsafe.Pointer(ptr), ret.step)
 	C.cvReleaseMat(&ret)
+	C.free(unsafe.Pointer(dst))
 
 	return data, nil
 }
